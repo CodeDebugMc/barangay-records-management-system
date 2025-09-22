@@ -2500,12 +2500,9 @@ CREATE TABLE `term_table` (
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `username` varchar(255) DEFAULT NULL,
-  `email` varchar(255) DEFAULT NULL,
-  `role` enum('superadmin','administrator','staff') NOT NULL,
+  `role` enum('superadmin','admin') NOT NULL,
   `password` varchar(60) DEFAULT NULL,
-  `employeeNumber` int(11) DEFAULT NULL,
-  `employmentCategory` tinyint(4) NOT NULL,
-  `access_level` varchar(1111) DEFAULT 'user',
+  `access_level` varchar(255) DEFAULT 'user',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 

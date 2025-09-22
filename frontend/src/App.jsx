@@ -1,22 +1,19 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import HolidaySuspension from './components/HolidaySuspension';
 import Leave from './components/Leave';
-import Department from './components/Department';
-import DepartmentAssignment from './components/DepartmentAssignment';
-import SalaryGrade from './components/SalaryGrade';
+import Register from './components/Register';
+import Login from './components/Login';
+import Dashboard from './components/Dashboard';
+import Dashboard1 from './components/Dashboard1';
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<HolidaySuspension />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/user" element={<Dashboard1 />} />
         <Route path="/leave" element={<Leave />} />
-        <Route path="/department" element={<Department />} />
-        <Route
-          path="/department-assignment"
-          element={<DepartmentAssignment />}
-        />
-        <Route path="/salary-grade" element={<SalaryGrade />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/" element={<Login />} />
       </Routes>
     </Router>
   );

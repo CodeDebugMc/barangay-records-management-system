@@ -5,11 +5,10 @@ import dotenv from 'dotenv';
 import multer from 'multer';
 import fs from 'fs';
 import bcrypt from 'bcryptjs';
-import { error } from 'console';
+import jwt from 'jsonwebtoken';
 import { promisify } from 'util';
 
 const app = express();
-const port = 5000;
 
 app.use(express.json());
 app.use(cors());
@@ -17,44 +16,109 @@ app.use(express.urlencoded({ extended: true }));
 
 // MySQL Connection
 dotenv.config();
-const db = mysql.createConnection({
+const port = process.env.PORT || 3000;
+
+const db = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-});
-
-// Database connection.
-db.connect((err) => {
-  if (err) {
-    console.error('Database connection failed:', err.message);
-    return;
-  }
-  console.log('Database Connected');
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
 });
 
 // Graceful Server Shutdown
 process.on('SIGINT', () => {
-  db.end((err) => {
-    console.log('Database connection closed.');
-    process.exit(err ? 1 : 0);
-  });
+  db.end()
+    .then(() => {
+      console.log('Database pool closed.');
+      process.exit(0);
+    })
+    .catch((err) => {
+      console.error('Error closing database pool:', err);
+      process.exit(1);
+    });
 });
-
-// To Improve error handling.
-// app.get('/holiday-suspension', (req, res) => {
-//   db.query('SELECT * FROM holidayandsuspension', (err, result) => {
-//     if (err) {
-//       console.error('Database Query Error', err.message);
-//       return res.status(500).json({ error: 'Internal Server Error' });
-//     }
-//     res.json(result);
-//   });
-// });
 
 // To reduced callback hell.
 // Convert `db.query` into a Promise-based function
 const query = promisify(db.query).bind(db);
+
+// REGISTER START HERE
+app.post('/register', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+      return res
+        .status(400)
+        .json({ error: 'Username and Password are required' });
+    }
+
+    // Hashed password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Check if user already exists
+    const existingUsers = await query(
+      `SELECT * FROM users WHERE username = ?`,
+      [username]
+    );
+    if (existingUsers.length > 0) {
+      return res.status(400).json({ message: 'Username already exists' });
+    }
+
+    // Insert user
+    await query('INSERT INTO users(username, password) VALUES (?, ?)', [
+      username,
+      hashedPassword,
+    ]);
+
+    res.status(201).json({ message: 'Registration successful!' });
+  } catch (err) {
+    console.error('Database Register Error:', err.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// LOGIN START HERE
+app.post('/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    const user = await query('SELECT * FROM users WHERE username = ?', [
+      username,
+    ]);
+
+    if (user.length === 0) {
+      return res.status(401).json({ error: 'User not found' });
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user[0].password);
+
+    const token = jwt.sign(
+      { username: user[0].username, role: user[0].role },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    if (!passwordMatch) {
+      return res.status(401).json({ error: 'Invalid username or password' });
+    }
+
+    return res.status(200).json({
+      message: 'Login successful',
+      username: user[0].username,
+      role: user[0].role,
+      token,
+    });
+  } catch (err) {
+    console.error('Database Login Error:', err.message);
+    return res.status(401).json({ error: 'Invalid username or password' });
+  }
+});
+
+// HOLIDAY AND SUSPENSION START HERE
 
 app.get('/holiday-suspension', async (req, res) => {
   try {
@@ -655,5 +719,5 @@ app.delete('/salary-grade/:id', async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server running on port ${port}.`);
+  console.log(`Server running on http://localhost:${port}`);
 });

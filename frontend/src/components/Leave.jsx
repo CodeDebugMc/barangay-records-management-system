@@ -31,7 +31,7 @@ const Leave = () => {
 
   const fetchLeave = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/leave');
+      const response = await axios.get('http://localhost:3000/leave');
       setData(response.data);
     } catch (err) {
       console.error('Error fetching leave data', err.message);
@@ -49,9 +49,9 @@ const Leave = () => {
     e.preventDefault();
     try {
       if (editingId) {
-        await axios.put(`http://localhost:5000/leave/${editingId}`, leave);
+        await axios.put(`http://localhost:3000/leave/${editingId}`, leave);
       } else {
-        await axios.post('http://localhost:5000/leave', leave);
+        await axios.post('http://localhost:3000/leave', leave);
       }
       setEditingId(null);
       fetchLeave();
@@ -62,13 +62,18 @@ const Leave = () => {
   };
 
   const handleEdit = (item) => {
-    setLeave(item);
+    setLeave({
+      leave_code: item.leave_code,
+      description: item.description,
+      number_hours: item.number_hours,
+      status: item.status,
+    });
     setEditingId(item.id);
   };
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/leave/${id}`);
+      await axios.delete(`http://localhost:3000/leave/${id}`);
       fetchLeave();
     } catch (error) {
       console.error('Error deleting leave record', error);

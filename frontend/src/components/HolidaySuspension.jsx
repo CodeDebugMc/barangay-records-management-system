@@ -69,7 +69,11 @@ const HolidaySuspension = () => {
   };
 
   const handleEdit = (item) => {
-    setHolidayAndSuspension(item);
+    setHolidayAndSuspension({
+      description: item.description,
+      date: item.date,
+      status: item.status,
+    });
     setEditingId(item.id);
   };
 
