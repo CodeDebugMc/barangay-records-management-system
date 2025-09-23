@@ -1,18 +1,18 @@
-import express from 'express';
-import bcrypt from 'bcryptjs';
-import { query } from '../db.js';
+import express from "express";
+import bcrypt from "bcryptjs";
+import { query } from "../db.js";
 
 const router = express.Router();
 
 // REGISTER START HERE
-router.post('/', async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const { username, password } = req.body;
 
     if (!username || !password) {
       return res
         .status(400)
-        .json({ error: 'Username and Password are required' });
+        .json({ error: "Username and Password are required" });
     }
 
     // Hashed password
@@ -24,19 +24,19 @@ router.post('/', async (req, res) => {
       [username]
     );
     if (existingUsers.length > 0) {
-      return res.status(400).json({ message: 'Username already exists' });
+      return res.status(400).json({ message: "Username already exists" });
     }
 
     // Insert user
-    await query('INSERT INTO users(username, password) VALUES (?, ?)', [
+    await query("INSERT INTO users(username, password) VALUES (?, ?)", [
       username,
       hashedPassword,
     ]);
 
-    res.status(201).json({ message: 'Registration successful!' });
+    res.status(201).json({ message: "Registration successful!" });
   } catch (err) {
-    console.error('Database Register Error:', err.message);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error("Error in POST /register:", err.message);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
