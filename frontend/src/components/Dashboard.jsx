@@ -8,7 +8,6 @@ import {
   Divider,
   Paper,
 } from "@mui/material";
-import CompanySettingsForm from "./CompanySettingsForm"; // import the settings component
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -61,13 +60,6 @@ const Dashboard = () => {
           Logout
         </Button>
       </Paper>
-
-      {(role === "superadmin" || role === "admin") && (
-        <Box>
-          <Divider sx={{ mb: 3 }} />
-          <CompanySettingsForm />
-        </Box>
-      )}
     </Container>
   );
 };

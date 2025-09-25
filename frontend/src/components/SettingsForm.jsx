@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -7,26 +7,33 @@ import {
   TextField,
   Typography,
   Paper,
+  Snackbar,
+  Alert,
 } from "@mui/material";
+import axios from "axios";
 import { styled } from "@mui/material/styles";
 
 const Input = styled("input")({
   display: "none",
 });
 
-const CompanySettingsForm = () => {
+const SettingsForm = ({ onUpdate, onPreview }) => {
   const [companyName, setCompanyName] = useState("");
   const [headerColor, setHeaderColor] = useState("#ffffff");
   const [footerText, setFooterText] = useState("");
   const [footerColor, setFooterColor] = useState("#ffffff");
   const [logo, setLogo] = useState(null);
-  const [preview, setPreview] = useState(null);
+  const [preview, setPreview] = useState(null); // new logo preview
+  const [currentLogo, setCurrentLogo] = useState(null); // DB logo
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
-  // Load existing settings from backend
+  // Load current settings
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await fetch("/company-settings"); // <-- adjust API path
+        const res = await fetch("http://localhost:3000/company-settings");
         const data = await res.json();
 
         if (data) {
@@ -35,7 +42,20 @@ const CompanySettingsForm = () => {
           setFooterText(data.footer_text || "");
           setFooterColor(data.footer_color || "#ffffff");
           if (data.logo_url) {
-            setPreview(data.logo_url);
+            setCurrentLogo(`http://localhost:3000${data.logo_url}`);
+          }
+
+          // Initialize preview
+          if (onPreview) {
+            onPreview({
+              company_name: data.company_name,
+              header_color: data.header_color,
+              footer_text: data.footer_text,
+              footer_color: data.footer_color,
+              logo_url: data.logo_url
+                ? `http://localhost:3000${data.logo_url}`
+                : null,
+            });
           }
         }
       } catch (error) {
@@ -44,18 +64,42 @@ const CompanySettingsForm = () => {
     };
 
     fetchSettings();
-  }, []);
+  }, [onPreview]);
 
-  // Handle image preview
+  // Handle logo file change
   const handleLogoChange = (e) => {
     const file = e.target.files[0];
     setLogo(file);
     if (file) {
-      setPreview(URL.createObjectURL(file));
+      const previewURL = URL.createObjectURL(file);
+      setPreview(previewURL);
+
+      if (onPreview) {
+        onPreview({
+          company_name: companyName,
+          header_color: headerColor,
+          footer_text: footerText,
+          footer_color: footerColor,
+          logo_url: previewURL,
+        });
+      }
     }
   };
 
-  // Submit form
+  // Handle live color/text preview
+  useEffect(() => {
+    if (onPreview) {
+      onPreview({
+        company_name: companyName,
+        header_color: headerColor,
+        footer_text: footerText,
+        footer_color: footerColor,
+        logo_url: preview || currentLogo,
+      });
+    }
+  }, [companyName, headerColor, footerText, footerColor, preview, currentLogo]);
+
+  // Save to backend
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -64,31 +108,44 @@ const CompanySettingsForm = () => {
     formData.append("header_color", headerColor);
     formData.append("footer_text", footerText);
     formData.append("footer_color", footerColor);
-    if (logo) {
-      formData.append("logo", logo);
-    }
+    if (logo) formData.append("logo", logo);
 
     try {
-      const res = await fetch("/company-settings", {
-        method: "POST",
-        body: formData,
+      await axios.post("http://localhost:3000/company-settings", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
-      const data = await res.json();
-      if (data.success) {
-        alert(data.message);
-      } else {
-        alert("Failed to save settings.");
-      }
+      setSnackbarMessage("Company settings updated successfully!");
+      setSnackbarSeverity("success");
+      setOpenSnackbar(true);
+
+      if (onUpdate) onUpdate();
     } catch (error) {
       console.error("Error saving settings:", error);
-      alert("Error occurred while saving.");
+      setSnackbarMessage("Failed to update settings. Try again.");
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
     }
   };
 
   return (
     <Container maxWidth="sm">
       <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={3000}
+          onClose={() => setOpenSnackbar(false)}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        >
+          <Alert
+            onClose={() => setOpenSnackbar(false)}
+            severity={snackbarSeverity}
+            sx={{ width: "100%" }}
+          >
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
+
         <Typography variant="h5" gutterBottom>
           Company Settings
         </Typography>
@@ -144,12 +201,26 @@ const CompanySettingsForm = () => {
                   onChange={handleLogoChange}
                 />
                 <Button variant="contained" component="span">
-                  Upload Logo
+                  Upload New Logo
                 </Button>
               </label>
+
+              {/* Current Logo */}
+              {currentLogo && !preview && (
+                <Box mt={2}>
+                  <Typography variant="subtitle2">Current Logo:</Typography>
+                  <img
+                    src={currentLogo}
+                    alt="Current Logo"
+                    style={{ maxWidth: "150px", marginTop: "8px" }}
+                  />
+                </Box>
+              )}
+
+              {/* Preview */}
               {preview && (
                 <Box mt={2}>
-                  <Typography variant="subtitle2">Preview:</Typography>
+                  <Typography variant="subtitle2">New Logo Preview:</Typography>
                   <img
                     src={preview}
                     alt="Logo Preview"
@@ -176,4 +247,4 @@ const CompanySettingsForm = () => {
   );
 };
 
-export default CompanySettingsForm;
+export default SettingsForm;

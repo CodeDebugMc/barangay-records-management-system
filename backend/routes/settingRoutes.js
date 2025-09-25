@@ -1,102 +1,78 @@
 import express from "express";
 import { query } from "../db.js";
 import multer from "multer";
-import fs from "fs";
 import path from "path";
+import fs from "fs";
 import { fileURLToPath } from "url";
 
 const router = express.Router();
 
-// Fix __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// File upload config
+const uploadDir = path.join(__dirname, "../uploads");
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
+
+// Multer config
 const storage = multer.diskStorage({
-  destination: "../uploads/",
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  },
+  destination: (req, file, cb) => cb(null, uploadDir),
+  filename: (req, file, cb) =>
+    cb(null, Date.now() + path.extname(file.originalname)),
 });
 
 const upload = multer({ storage });
 
 router.get("/", async (req, res) => {
   try {
-    const result = await query(`SELECT * FROM company_settings WHERE id = 1`);
-    res.send(result[0] || {});
+    const rows = await query("SELECT * FROM company_settings WHERE id = 1");
+    res.json(rows[0] || {});
   } catch (err) {
-    console.error("Database Query Error", err.message);
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error("GET error:", err.message);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
-// Helper to delete old logo
-const deleteOldLogo = (logoUrl) => {
-  if (!logoUrl) return;
-  const logoPath = path.join(__dirname, "..", logoUrl); // assumes logoUrl = /uploads/filename.png
-  fs.unlink(logoPath, (err) => {
-    if (err) {
-      console.error(`Error deleting old logo at ${logoPath}: ${err}`);
-    } else {
-      console.log(`Previous logo at ${logoPath} deleted successfully`);
-    }
-  });
-};
-
 router.post("/", upload.single("logo"), async (req, res) => {
   try {
-    const companyName = req.body.company_name || "";
-    const headerColor = req.body.header_color || "#fff";
-    const footerText = req.body.footer_text || "";
-    const footerColor = req.body.footer_color || "#fff";
-    const logoUrl = req.file ? `../uploads/${req.file.filename}` : null;
+    const { company_name, header_color, footer_text, footer_color } = req.body;
+    const logoUrl = req.file ? `/uploads/${req.file.filename}` : null;
 
-    // Check if record exists
-    const result = await query(`SELECT * FROM company_settings WHERE id = 1`);
+    const rows = await query("SELECT * FROM company_settings WHERE id = 1");
 
-    if (result.length > 0) {
-      // Update existing record
-      const oldLogoUrl = result[0].logo_url;
-
+    if (rows.length > 0) {
+      // Update
       let sql = `
-        UPDATE company_settings 
-        SET company_name = ?, header_color = ?, footer_text = ?, footer_color = ?
+        UPDATE company_settings
+        SET company_name=?, header_color=?, footer_text=?, footer_color=?
       `;
-      const params = [companyName, headerColor, footerText, footerColor];
+      const params = [company_name, header_color, footer_text, footer_color];
 
       if (logoUrl) {
-        sql += `, logo_url = ?`;
+        sql += `, logo_url=?`;
         params.push(logoUrl);
+
+        // Delete old logo
+        const oldLogo = rows[0].logo_url;
+        if (oldLogo) {
+          const oldPath = path.join(__dirname, "..", oldLogo);
+          if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+        }
       }
 
-      sql += ` WHERE id = 1`;
-
+      sql += " WHERE id=1";
       await query(sql, params);
-
-      if (logoUrl && oldLogoUrl) {
-        deleteOldLogo(oldLogoUrl);
-      }
-
-      res.send({ success: true, message: "Company settings updated" });
+      res.json({ success: true, message: "Settings updated" });
     } else {
-      // Insert new record
-      const sql = `
-        INSERT INTO company_settings (company_name,logo_url,header_color, footer_text, footer_color) 
-        VALUES (?, ?, ?, ?, ?)
-      `;
-      await query(sql, [
-        companyName,
-        logoUrl,
-        headerColor,
-        footerText,
-        footerColor,
-      ]);
-      res.send({ success: true, message: "Company settings created" });
+      // Insert
+      await query(
+        "INSERT INTO company_settings (id, company_name, logo_url, header_color, footer_text, footer_color) VALUES (1, ?, ?, ?, ?, ?)",
+        [company_name, logoUrl, header_color, footer_text, footer_color]
+      );
+      res.json({ success: true, message: "Settings created" });
     }
   } catch (err) {
-    console.error("Error in POST /company-settings:", err.message);
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error("POST error:", err.message);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 

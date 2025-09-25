@@ -16,6 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/leave", leaveRoutes);
 app.use("/login", loginRoutes);
 app.use("/register", registerRoutes);
+app.use("/uploads", express.static("uploads"));
 app.use("/company-settings", settingsRoutes);
 
 app.listen(port, () => {
