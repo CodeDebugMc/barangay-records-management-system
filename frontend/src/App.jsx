@@ -13,7 +13,10 @@ import CertificationAction from "./components/CertificationAction";
 import CertificationFinancialAssistance from "./components/CertFinancialAssistance";
 import SettingsForm from "./components/SettingsForm";
 import CertOnApperance from "./components/CertOnApperance";
+<<<<<<< HEAD
 import Overview from "./components/overview";
+=======
+>>>>>>> 031b758782757aef4f5dc8383b09280f11d030d0
 
 function App() {
   const [settings, setSettings] = useState({});
@@ -89,7 +92,10 @@ function App() {
               <Route path="/user" element={<Dashboard1 />} />
               <Route path="/leave" element={<Leave />} />
               <Route path="/cert2" element={<CertOnApperance />} />
+<<<<<<< HEAD
               <Route path="/overview" element={<Overview />} />
+=======
+>>>>>>> 031b758782757aef4f5dc8383b09280f11d030d0
               <Route
                 path="/cert1"
                 element={<CertificationFinancialAssistance />}

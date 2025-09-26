@@ -39,7 +39,11 @@ const Login = () => {
       localStorage.setItem("role", response.data.role);
 
       setError(""); // Clear error on success
+<<<<<<< HEAD
       navigate("/overview");
+=======
+      navigate("/dashboard");
+>>>>>>> 031b758782757aef4f5dc8383b09280f11d030d0
     } catch (error) {
       console.error("Error logging in", error);
       setError(error.response?.data?.error || "Login failed. Try again.");
