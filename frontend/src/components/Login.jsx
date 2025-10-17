@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import logo from "../assets/bagong-pilipinas-logo.png";
+import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -22,6 +23,21 @@ const Login = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  const auth = useAuth(); // may be null if provider not mounted
+  // Guard: if context is missing, show a helpful message instead of crashing
+  if (auth === null) {
+    return (
+      <Container>
+        <Typography sx={{ mt: 6 }}>
+          Auth not initialized. Make sure your app is wrapped with{" "}
+          <strong>AuthProvider</strong>.
+        </Typography>
+      </Container>
+    );
+  }
+
+  const { login } = auth;
+
   const handleLogin = async () => {
     try {
       if (!username || !password) {
@@ -29,20 +45,26 @@ const Login = () => {
         return;
       }
 
-      const response = await axios.post("http://localhost:3000/login", {
+      const res = await axios.post("http://localhost:3000/login", {
         username,
         password,
       });
+      login({
+        token: res.data.token,
+        username: res.data.username,
+        role: res.data.role,
+        id: res.data.id,
+      });
 
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("username", response.data.username);
-      localStorage.setItem("role", response.data.role);
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("username", res.data.username);
+      localStorage.setItem("role", res.data.role);
 
       setError(""); // Clear error on success
       navigate("/overview");
     } catch (error) {
       console.error("Error logging in", error);
-      setError(error.response?.data?.error || "Login failed. Try again.");
+      setError(error.res?.data?.error || "Login failed. Try again.");
     }
   };
 
