@@ -2,8 +2,6 @@ import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AppBar, Toolbar, Typography, Box, Container } from "@mui/material";
-import ProtectedRoute from "./components/ProtectedRoute";
-import Unauthorize from "./components/404";
 
 // Import components
 import Leave from "./components/Leave";
@@ -15,6 +13,8 @@ import CertificationFinancialAssistance from "./components/CertFinancialAssistan
 import SettingsForm from "./components/SettingsForm";
 import CertOnApperance from "./components/CertOnApperance";
 import Overview from "./components/overview";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Unauthorize from "./components/404";
 
 function App() {
   const [settings, setSettings] = useState({});
