@@ -1,262 +1,365 @@
-import LogoNgCaloocan from "../assets/Caloocan_City.png";
-import Logo145 from "../assets/brgy_145.png";
+import { useState } from 'react';
+import LogoNgCaloocan from '../assets/Caloocan_City.png';
+import Logo145 from '../assets/brgy_145.png';
+import axios from 'axios';
+import {
+  Alert,
+  Container,
+  Snackbar,
+  Box,
+  Typography,
+  TextField,
+  InputLabel,
+  FormControl,
+} from '@mui/material';
+
+const baseURL = 'http://localhost:3000';
 
 const CertificationFinancialAssistance = () => {
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [formData, setFormData] = useState({
+    name: '',
+    age: '',
+    birthday: '',
+    address: '',
+    income: '',
+    purpose: '',
+    dateIssued: '',
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSave = async () => {
+    try {
+      await axios.post(`${baseURL}/certificates`);
+      setSnackbarMessage(
+        'Certicate of Financial Assistance saved successfully'
+      );
+      setSnackbarSeverity('success');
+    } catch (e) {
+      console.error('Error saving Certificate of Financial A', e.message);
+      setSnackbarMessage('Error saving cert failed');
+      setSnackbarSeverity('error');
+    }
+  };
+
   return (
-    <div style={styles.page}>
-      {/* Logos */}
-      <img
-        src={LogoNgCaloocan}
-        alt="City Logo"
-        style={{
-          width: "120px",
-          position: "absolute",
-          top: "30px",
-          left: "60px",
-        }}
-      />
-      <img
-        src={Logo145}
-        alt="Barangay Logo"
-        style={{
-          width: "120px",
-          position: "absolute",
-          top: "30px",
-          right: "60px",
-        }}
-      />
+    <Container>
+      <Box sx={{ marginBottom: 20, textAlign: 'center' }}>
+        <Typography variant="h3" component="h1">
+          Certification Form
+        </Typography>
+        <TextField
+          variant="standard"
+          label="Name"
+          required
+          sx={{ margin: 2 }}
+          value={formData.name}
+        ></TextField>
+        <TextField
+          variant="standard"
+          label="Age"
+          sx={{ margin: 2 }}
+          required
+          value={formData.age}
+        ></TextField>{' '}
+        <TextField
+          variant="standard"
+          label="Birtday"
+          sx={{ margin: 2 }}
+          required
+          value={formData.birthday}
+        ></TextField>{' '}
+        <TextField
+          variant="standard"
+          label="Address"
+          sx={{ margin: 2 }}
+          required
+          value={formData.address}
+        ></TextField>{' '}
+        <TextField
+          variant="standard"
+          sx={{ margin: 2 }}
+          label="income"
+          required
+          value={formData.income}
+        ></TextField>{' '}
+        <TextField
+          variant="standard"
+          label="Purpose"
+          sx={{ margin: 2 }}
+          required
+          value={formData.purpose}
+        ></TextField>
+        <TextField
+          variant="standard"
+          label="Date issued"
+          sx={{ margin: 2 }}
+          required
+          value={formData.dateIssued}
+        ></TextField>
+      </Box>
+      <div style={styles.page}>
+        {/* Logos */}
+        <img
+          src={LogoNgCaloocan}
+          alt="City Logo"
+          style={{
+            width: '120px',
+            position: 'absolute',
+            top: '30px',
+            left: '60px',
+          }}
+        />
+        <img
+          src={Logo145}
+          alt="Barangay Logo"
+          style={{
+            width: '120px',
+            position: 'absolute',
+            top: '30px',
+            right: '60px',
+          }}
+        />
 
-      {/* Watermark */}
-      <img src={Logo145} alt="Watermark" style={styles.watermarkImg} />
+        {/* Watermark */}
+        <img src={Logo145} alt="Watermark" style={styles.watermarkImg} />
 
-      {/* Header */}
-      <div style={styles.republic}>Republic of the Philippines</div>
-      <div style={styles.city}>CITY OF CALOOCAN</div>
-      <div style={styles.barangay}>
-        BARANGAY 145 ZONES 13 DIST. 1 <br />
-        Tel. No. 8711-7134
-      </div>
+        {/* Header */}
+        <div style={styles.republic}>Republic of the Philippines</div>
+        <div style={styles.city}>CITY OF CALOOCAN</div>
+        <div style={styles.barangay}>
+          BARANGAY 145 ZONES 13 DIST. 1 <br />
+          Tel. No. 8711-7134
+        </div>
 
-      <div style={styles.office}>OFFICE OF THE BARANGAY CHAIRMAN</div>
-      <hr />
-      <div style={styles.certification}>certification</div>
+        <div style={styles.office}>OFFICE OF THE BARANGAY CHAIRMAN</div>
+        <hr />
+        <div style={styles.certification}>certification</div>
 
-      <div style={styles.toWhomItMayConcern}>to whom it may concern:</div>
+        <div style={styles.toWhomItMayConcern}>to whom it may concern:</div>
 
-      <div style={styles.paragraph}>
-        <p>
-          <div style={styles.textIndent}>
-            This is to certify that, NAME, AGE yrs. old, born on Dec. 26, 1966
-            BIRTHDAY a bonafide resident at Barangay 145 with actual postal
-            address located at 216 Magaling St., Barangay 145, Bagong Barrio,
-            Caloocan City. <br />
-            <br />
+        <div style={styles.paragraph}>
+          <p>
+            <div style={styles.textIndent}>
+              This is to certify that,<b>{formData.name || '________'}</b>,{' '}
+              <b>{formData.age || '_______'}</b>
+              yrs. old, born on Dec. 26, 1966 BIRTHDAY a bonafide resident at
+              Barangay 145 with actual postal address located at 216 Magaling
+              St., Barangay 145, Bagong Barrio, Caloocan City. <br />
+              <br />
+            </div>
+            <div style={styles.textIndent}>
+              This further certifies that the above-mentioned name has a LOW
+              SOURCE OF INCOME (Electrician) PURPOSE , with monthly income not
+              exceeding 3,000 INCOME. <br /> <br />
+            </div>
+
+            <div style={styles.textIndent}>
+              This certification is being issued for Financial Assistance.{' '}
+              <br /> <br />
+            </div>
+            <div style={styles.textIndent}>
+              Issued this 17th day of Sept., 2025 DATE at Barangay 145, Zone 13,
+              District 1, Caloocan City.
+            </div>
+          </p>
+        </div>
+
+        {/* Bottom Section */}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            marginTop: '80px',
+            width: '100%',
+            fontStyle: 'italic',
+          }}
+        >
+          {/* Prepared By */}
+          <div>
+            <div style={{ textAlign: 'left' }}>
+              <br />
+              <p
+                style={{
+                  textTransform: 'uppercase',
+                  display: 'inline-block',
+                  margin: 0,
+                  fontStyle: 'normal',
+                }}
+              >
+                Rosalina P. Anore
+              </p>
+              <br />
+              <p
+                style={{
+                  display: 'inline-block',
+                  margin: '0px 12px',
+                  fontSize: 12,
+                }}
+              >
+                Barangay Secretary
+              </p>
+            </div>
           </div>
-          <div style={styles.textIndent}>
-            This further certifies that the above-mentioned name has a LOW
-            SOURCE OF INCOME (Electrician) PURPOSE , with monthly income not
-            exceeding 3,000 INCOME. <br /> <br />
-          </div>
 
-          <div style={styles.textIndent}>
-            This certification is being issued for Financial Assistance. <br />{" "}
-            <br />
-          </div>
-          <div style={styles.textIndent}>
-            Issued this 17th day of Sept., 2025 DATE at Barangay 145, Zone 13,
-            District 1, Caloocan City.
-          </div>
-        </p>
-      </div>
-
-      {/* Bottom Section */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginTop: "80px",
-          width: "100%",
-          fontStyle: "italic",
-        }}
-      >
-        {/* Prepared By */}
-        <div>
-          <div style={{ textAlign: "left" }}>
+          {/* Signature */}
+          <div style={{ textAlign: 'right' }}>
             <br />
             <p
               style={{
-                textTransform: "uppercase",
-                display: "inline-block",
+                textTransform: 'uppercase',
+                display: 'inline-block',
                 margin: 0,
-                fontStyle: "normal",
+                fontStyle: 'normal',
               }}
             >
-              Rosalina P. Anore
+              arnold l. dondonayos
             </p>
             <br />
             <p
               style={{
-                display: "inline-block",
-                margin: "0px 12px",
+                display: 'inline-block',
+                margin: '0px 12px',
                 fontSize: 12,
               }}
             >
-              Barangay Secretary
+              Punong Barangay - Brgy.145
             </p>
           </div>
         </div>
-
-        {/* Signature */}
-        <div style={{ textAlign: "right" }}>
-          <br />
-          <p
-            style={{
-              textTransform: "uppercase",
-              display: "inline-block",
-              margin: 0,
-              fontStyle: "normal",
-            }}
-          >
-            arnold l. dondonayos
-          </p>
-          <br />
-          <p
-            style={{
-              display: "inline-block",
-              margin: "0px 12px",
-              fontSize: 12,
-            }}
-          >
-            Punong Barangay - Brgy.145
-          </p>
-        </div>
-      </div>
-    </div> // closes the main page div
+      </div>{' '}
+      // closes the main page div
+    </Container>
   );
 };
 
 const styles = {
   page: {
-    width: "210mm", // A4 width
-    minHeight: "297mm", // A4 height
-    margin: "0 auto",
-    padding: "40px",
-    border: "1px solid #000",
-    position: "relative",
-    backgroundColor: "#fff",
-    boxSizing: "border-box",
-    fontWeight: "bold", // all text bold by default
+    width: '210mm', // A4 width
+    minHeight: '297mm', // A4 height
+    margin: '0 auto',
+    padding: '40px',
+    border: '1px solid #000',
+    position: 'relative',
+    backgroundColor: '#fff',
+    boxSizing: 'border-box',
+    fontWeight: 'bold', // all text bold by default
   },
   watermarkImg: {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
     opacity: 0.1,
-    width: "75%",
-    pointerEvents: "none",
+    width: '75%',
+    pointerEvents: 'none',
     zIndex: 0,
   },
   republic: {
-    textAlign: "center",
+    textAlign: 'center',
     fontFamily: "'Quintessential', cursive",
-    fontSize: "18px",
+    fontSize: '18px',
   },
   city: {
-    textAlign: "center",
+    textAlign: 'center',
     fontFamily: "'Roboto', sans-serif",
-    fontSize: "16px",
+    fontSize: '16px',
   },
   barangay: {
-    textAlign: "center",
+    textAlign: 'center',
     fontFamily: "'Roboto', sans-serif",
-    fontSize: "14px",
+    fontSize: '14px',
     fontWeight: 600, // not bold
   },
   office: {
-    textAlign: "center",
+    textAlign: 'center',
     fontFamily: "'Roboto', sans-serif",
-    fontSize: "18px",
-    marginBottom: "32px",
-    fontWeight: "bold",
+    fontSize: '18px',
+    marginBottom: '32px',
+    fontWeight: 'bold',
   },
 
   lupon: {
-    textAlign: "center",
-    fontFamily: "Calibri, sans-serif",
-    fontStyle: "italic",
-    fontSize: "16px",
-    marginBottom: "2px",
-    fontWeight: "bold",
+    textAlign: 'center',
+    fontFamily: 'Calibri, sans-serif',
+    fontStyle: 'italic',
+    fontSize: '16px',
+    marginBottom: '2px',
+    fontWeight: 'bold',
   },
   date: {
-    textAlign: "right",
-    fontFamily: "Calibri, sans-serif",
-    fontSize: "14px",
-    marginBottom: "20px",
-    fontStyle: "italic",
+    textAlign: 'right',
+    fontFamily: 'Calibri, sans-serif',
+    fontSize: '14px',
+    marginBottom: '20px',
+    fontStyle: 'italic',
   },
   caseInfo: {
-    textAlign: "right",
-    fontFamily: "Calibri, sans-serif",
-    fontSize: "14px",
-    marginBottom: "20px",
-    fontStyle: "italic",
+    textAlign: 'right',
+    fontFamily: 'Calibri, sans-serif',
+    fontSize: '14px',
+    marginBottom: '20px',
+    fontStyle: 'italic',
   },
   title: {
-    textAlign: "center",
-    fontFamily: "Calibri, sans-serif",
-    fontSize: "17px",
+    textAlign: 'center',
+    fontFamily: 'Calibri, sans-serif',
+    fontSize: '17px',
 
-    margin: "30px 0",
-    fontStyle: "italic",
+    margin: '30px 0',
+    fontStyle: 'italic',
   },
   content: {
-    margin: "20px 0",
-    fontFamily: "Calibri, sans-serif",
-    fontSize: "14px",
-    position: "relative",
+    margin: '20px 0',
+    fontFamily: 'Calibri, sans-serif',
+    fontSize: '14px',
+    position: 'relative',
     zIndex: 1,
-    fontStyle: "italic",
+    fontStyle: 'italic',
   },
   preparedBy: {
-    marginTop: "60px",
-    fontFamily: "Calibri, sans-serif",
-    fontSize: "14px",
-    width: "15%", // Optional: restrict width for proper alignment
-    display: "inline-block",
-    fontStyle: "italic",
+    marginTop: '60px',
+    fontFamily: 'Calibri, sans-serif',
+    fontSize: '14px',
+    width: '15%', // Optional: restrict width for proper alignment
+    display: 'inline-block',
+    fontStyle: 'italic',
   },
 
   signature: {
-    marginTop: "40px",
-    fontFamily: "Calibri, sans-serif",
-    fontSize: "14px",
-    fontStyle: "italic",
+    marginTop: '40px',
+    fontFamily: 'Calibri, sans-serif',
+    fontSize: '14px',
+    fontStyle: 'italic',
   },
 
   // Changes here
   certification: {
-    textAlign: "center",
+    textAlign: 'center',
     fontFamily: "'Times new roman', sans-serif",
-    fontSize: "56px",
-    textTransform: "uppercase",
-    letterSpacing: "6px",
-    color: "#444",
-    marginBottom: "48px",
+    fontSize: '56px',
+    textTransform: 'uppercase',
+    letterSpacing: '6px',
+    color: '#444',
+    marginBottom: '48px',
   },
   toWhomItMayConcern: {
-    textTransform: "uppercase",
-    fontSize: "18px",
+    textTransform: 'uppercase',
+    fontSize: '18px',
     fontFamily: "'Calibri', sans-serif",
-    marginBottom: "32px",
+    marginBottom: '32px',
   },
 
   textIndent: {
-    textIndent: "50px",
+    textIndent: '50px',
   },
   paragraph: {
-    fontSize: "16px",
+    fontSize: '16px',
   },
 };
 
