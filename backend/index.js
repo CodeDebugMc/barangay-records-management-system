@@ -1,27 +1,27 @@
-import express from 'express';
-import cors from 'cors';
-import leaveRoutes from './routes/leaveRoutes.js';
-import loginRoutes from './routes/loginRoutes.js';
-import registerRoutes from './routes/registerRoutes.js';
-import settingsRoutes from './routes/settingRoutes.js';
-import meRouter from './routes/me.js';
-import certFinancialAssistanceRoutes from './routes/certFinancialAssistance.js';
+import express from "express";
+import cors from "cors";
+import leaveRoutes from "./routes/leaveRoutes.js";
+import loginRoutes from "./routes/loginRoutes.js";
+import registerRoutes from "./routes/registerRoutes.js";
+import settingsRoutes from "./routes/settingRoutes.js";
+import meRouter from "./routes/me.js";
+// import certFinancialAssistanceRoutes from './routes/certFinancialAssistance.js';
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-app.use('/leave', leaveRoutes);
-app.use('/login', loginRoutes);
-app.use('/register', registerRoutes);
-app.use('/uploads', express.static('uploads'));
-app.use('/company-settings', settingsRoutes);
-app.use('/me', meRouter);
-app.use('/certificates', certFinancialAssistanceRoutes);
+app.use("/leave", leaveRoutes);
+app.use("/login", loginRoutes);
+app.use("/register", registerRoutes);
+app.use("/uploads", express.static("uploads"));
+app.use("/company-settings", settingsRoutes);
+app.use("/me", meRouter);
+// app.use('/certificates', certFinancialAssistanceRoutes);
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
