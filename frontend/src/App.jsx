@@ -98,7 +98,14 @@ function App() {
               <Route path="/user" element={<Dashboard1 />} />
               <Route path="/leave" element={<Leave />} />
               <Route path="/cert2" element={<CertOnApperance />} />
-              <Route path="/overview" element={<Overview />} />
+              <Route
+                path="/overview"
+                element={
+                  <ProtectedRoute>
+                    <Overview />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/cert1"
                 element={<CertificationFinancialAssistance />}
