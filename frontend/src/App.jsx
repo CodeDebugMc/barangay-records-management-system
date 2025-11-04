@@ -15,6 +15,7 @@ import CertOnApperance from "./components/CertOnApperance";
 import Overview from "./components/overview";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Unauthorize from "./components/404";
+import { BASE_URL } from "./components/apiConfig";
 
 function App() {
   const [settings, setSettings] = useState({});
@@ -22,9 +23,7 @@ function App() {
   // Fetch settings from backend
   const fetchSettings = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:3000/company-settings"
-      );
+      const response = await axios.get(`${BASE_URL}/company-settings`);
       setSettings(response.data);
     } catch (error) {
       console.error("Error fetching settings:", error);
@@ -62,7 +61,7 @@ function App() {
             <Toolbar>
               {settings.logo_url && (
                 <img
-                  src={`http://localhost:3000${settings.logo_url}`}
+                  src={`${BASE_URL}${settings.logo_url}`}
                   alt="Logo"
                   style={{ height: "56px", margin: "0px 10px 0px 130px" }}
                 />

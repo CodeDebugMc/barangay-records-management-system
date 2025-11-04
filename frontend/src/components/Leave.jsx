@@ -13,6 +13,7 @@ import {
   Paper,
   Container,
 } from "@mui/material";
+import { BASE_URL } from "./apiConfig";
 
 const Leave = () => {
   const [data, setData] = useState([]);
@@ -31,7 +32,7 @@ const Leave = () => {
 
   const fetchLeave = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/leave");
+      const response = await axios.get(`${BASE_URL}/leave`);
       setData(response.data);
     } catch (err) {
       console.error("Error fetching leave data", err.message);
@@ -49,9 +50,9 @@ const Leave = () => {
     e.preventDefault();
     try {
       if (editingId) {
-        await axios.put(`http://localhost:3000/leave/${editingId}`, leave);
+        await axios.put(`${BASE_URL}/leave/${editingId}`, leave);
       } else {
-        await axios.post("http://localhost:3000/leave", leave);
+        await axios.post(`${BASE_URL}/leave`, leave);
       }
       setEditingId(null);
       fetchLeave();
@@ -73,7 +74,7 @@ const Leave = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:3000/leave/${id}`);
+      await axios.delete(`${BASE_URL}/leave/${id}`);
       fetchLeave();
     } catch (error) {
       console.error("Error deleting leave record", error);

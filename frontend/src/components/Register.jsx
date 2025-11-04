@@ -12,6 +12,7 @@ import {
   Alert,
   Link,
 } from "@mui/material";
+import { BASE_URL } from "./apiConfig";
 
 const Register = () => {
   const [username, setUsername] = useState("");
@@ -31,7 +32,7 @@ const Register = () => {
         return;
       }
 
-      const response = await axios.post("http://localhost:3000/register", {
+      const response = await axios.post(`${BASE_URL}/register`, {
         username,
         password,
       });

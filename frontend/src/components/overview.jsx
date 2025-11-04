@@ -19,6 +19,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import GavelIcon from "@mui/icons-material/Gavel";
 import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
 import PeopleIcon from "@mui/icons-material/People";
+import { BASE_URL } from "./apiConfig";
 
 const Overview = () => {
   const [totalRequests, setTotalRequests] = useState(0);
@@ -27,9 +28,7 @@ const Overview = () => {
   useEffect(() => {
     const fetchRequests = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:3000/requests/count"
-        );
+        const response = await axios.get(`${BASE_URL}/requests/count`);
         setTotalRequests(response.data.total || 0);
       } catch (error) {
         console.error("Error fetching requests count", error);
@@ -84,7 +83,7 @@ const Overview = () => {
       title: "Financial Assistance",
       desc: "Submit a new request form",
       icon: <AssignmentIcon sx={{ fontSize: 50, color: "primary.main" }} />,
-      path: "/request-form",
+      path: "/cert1",
     },
     {
       title: "Cohabitation",

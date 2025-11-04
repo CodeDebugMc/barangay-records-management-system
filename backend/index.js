@@ -5,6 +5,7 @@ import loginRoutes from "./routes/loginRoutes.js";
 import registerRoutes from "./routes/registerRoutes.js";
 import settingsRoutes from "./routes/settingRoutes.js";
 import meRouter from "./routes/me.js";
+import financialAssistance from "./routes/financialAssistance.js";
 // import certFinancialAssistanceRoutes from './routes/certFinancialAssistance.js';
 
 const app = express();
@@ -21,6 +22,8 @@ app.use("/register", registerRoutes);
 app.use("/uploads", express.static("uploads"));
 app.use("/company-settings", settingsRoutes);
 app.use("/me", meRouter);
+app.use("/financial-assistance", financialAssistance);
+
 // app.use('/certificates', certFinancialAssistanceRoutes);
 
 app.listen(port, () => {

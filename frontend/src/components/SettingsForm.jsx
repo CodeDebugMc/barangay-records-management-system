@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { styled } from "@mui/material/styles";
+import { BASE_URL } from "./apiConfig";
 
 const Input = styled("input")({
   display: "none",
@@ -33,7 +34,7 @@ const SettingsForm = ({ onUpdate, onPreview }) => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await fetch("http://localhost:3000/company-settings");
+        const res = await fetch(`${BASE_URL}/company-settings`);
         const data = await res.json();
 
         if (data) {
@@ -42,7 +43,7 @@ const SettingsForm = ({ onUpdate, onPreview }) => {
           setFooterText(data.footer_text || "");
           setFooterColor(data.footer_color || "#ffffff");
           if (data.logo_url) {
-            setCurrentLogo(`http://localhost:3000${data.logo_url}`);
+            setCurrentLogo(`${BASE_URL}${data.logo_url}`);
           }
 
           // Initialize preview
@@ -52,9 +53,7 @@ const SettingsForm = ({ onUpdate, onPreview }) => {
               header_color: data.header_color,
               footer_text: data.footer_text,
               footer_color: data.footer_color,
-              logo_url: data.logo_url
-                ? `http://localhost:3000${data.logo_url}`
-                : null,
+              logo_url: data.logo_url ? `${BASE_URL}${data.logo_url}` : null,
             });
           }
         }
@@ -111,7 +110,7 @@ const SettingsForm = ({ onUpdate, onPreview }) => {
     if (logo) formData.append("logo", logo);
 
     try {
-      await axios.post("http://localhost:3000/company-settings", formData, {
+      await axios.post(`${BASE_URL}/company-settings`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
